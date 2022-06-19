@@ -1,4 +1,5 @@
 import ReactDOM from "react-dom/client";
+import { QueryClient, QueryClientProvider } from "react-query";
 import { RecoilRoot } from "recoil";
 import { createGlobalStyle, ThemeProvider } from "styled-components";
 import App from "./App";
@@ -149,7 +150,7 @@ const GlobalStyle = createGlobalStyle`
    body {
      font-family: 'Mukta', sans-serif;
      background-color: white;
-     color: black;
+     color: ${(props) => props.theme.white.lighter};
      height: 200vh; // TODO: 삭제
      
    }
@@ -168,11 +169,16 @@ const GlobalStyle = createGlobalStyle`
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );
+
+const client = new QueryClient();
+
 root.render(
   <RecoilRoot>
-    <ThemeProvider theme={theme}>
-      <GlobalStyle />
-      <App />
-    </ThemeProvider>
+    <QueryClientProvider client={client}>
+      <ThemeProvider theme={theme}>
+        <GlobalStyle />
+        <App />
+      </ThemeProvider>
+    </QueryClientProvider>
   </RecoilRoot>
 );
