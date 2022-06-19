@@ -1,6 +1,7 @@
-import { AnimatePresence, motion } from "framer-motion";
-import { useState } from "react";
+import { AnimatePresence, motion, useViewportScroll } from "framer-motion";
+import { useEffect, useState } from "react";
 import { useQuery } from "react-query";
+import { useMatch, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { getMovies, IGetMoviesResult } from "../api";
 import { makeImagePath } from "../utiles";
@@ -8,6 +9,9 @@ import { makeImagePath } from "../utiles";
 const offset = 6;
 
 function Home() {
+  const { scrollY } = useViewportScroll();
+  const navigate = useNavigate();
+  const movieMatch = useMatch("/movie/:movieId");
   const { data, isLoading } = useQuery<IGetMoviesResult>(
     ["movies", "nowPlaying"],
     getMovies
@@ -29,6 +33,20 @@ function Home() {
     setLeaving((prev) => !prev);
   };
 
+  const onBoxClicked = (movieId: number) => {
+    navigate(`movie/${movieId}`);
+  };
+
+  const clickedMovie =
+    movieMatch?.params.movieId &&
+    data?.results.find(
+      (movie) => String(movie.id) === movieMatch.params.movieId
+    );
+
+  const onOverlayClick = () => {
+    navigate("/");
+  };
+
   const slider = {
     hidden: { x: window.outerWidth + 5 },
     visible: { x: 0 },
@@ -38,7 +56,7 @@ function Home() {
     normal: { scale: 1 },
     hover: {
       scale: 1.3,
-      transition: { delay: 0.3, type: "tween" },
+      transition: { delay: 0.2, duration: 0.3, type: "tween" },
       y: -50,
     },
   };
@@ -46,7 +64,7 @@ function Home() {
   const infoVar = {
     hover: {
       opacity: 1,
-      transition: { delay: 0.3, type: "tween" },
+      transition: { delay: 0.2, duration: 0.3, type: "tween" },
     },
   };
 
@@ -78,10 +96,12 @@ function Home() {
                   .slice(offset * index, offset * index + offset)
                   .map((movie) => (
                     <Box
+                      layoutId={String(movie.id)}
                       key={movie.id}
                       variants={boxVar}
                       initial="normal"
                       whileHover="hover"
+                      onClick={() => onBoxClicked(movie.id)}
                       poster={makeImagePath(movie.backdrop_path, "w500")}
                     >
                       <Info variants={infoVar}>
@@ -92,6 +112,35 @@ function Home() {
               </Row>
             </AnimatePresence>
           </Slider>
+          <AnimatePresence>
+            {movieMatch && (
+              <Overlay
+                onClick={onOverlayClick}
+                exit={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+              >
+                <MovieModal
+                  style={{ top: scrollY.get() + 50 }}
+                  layoutId={movieMatch.params.movieId}
+                >
+                  {clickedMovie && (
+                    <>
+                      <BigCover
+                        style={{
+                          backgroundImage: `linear-gradient(to top, black, transparent), url(${makeImagePath(
+                            clickedMovie.backdrop_path,
+                            "w500"
+                          )})`,
+                        }}
+                      />
+                      <BigTitle>{clickedMovie.title}</BigTitle>
+                      <BigOverview>{clickedMovie.overview}</BigOverview>
+                    </>
+                  )}
+                </MovieModal>
+              </Overlay>
+            )}
+          </AnimatePresence>
         </>
       )}
     </Wrapper>
@@ -151,6 +200,7 @@ const Box = styled(motion.div)<{ poster: string }>`
   background-size: cover;
   background-position: center center;
   height: 150px;
+  cursor: pointer;
   &:first-child {
     transform-origin: center left;
   }
@@ -163,12 +213,57 @@ const Info = styled(motion.div)`
   position: absolute;
   bottom: 0;
   width: 100%;
+  height: 20%;
   background-color: ${(props) => props.theme.black.lighter};
-  padding: 10px;
+  padding: 5px;
   opacity: 0;
+  border: none;
 
   h4 {
     font-size: 15px;
     text-align: center;
   }
+`;
+
+const Overlay = styled(motion.div)`
+  position: fixed;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  opacity: 0;
+`;
+
+const MovieModal = styled(motion.div)`
+  position: absolute;
+  width: 40vw;
+  height: 80vh;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  border-radius: 15px;
+  overflow: hidden;
+  background-color: ${(props) => props.theme.black.lighter};
+`;
+
+const BigCover = styled.div`
+  width: 100%;
+  background-size: cover;
+  background-position: center center;
+  height: 400px;
+`;
+
+const BigTitle = styled.h3`
+  color: ${(props) => props.theme.white.lighter};
+  padding: 20px;
+  font-size: 46px;
+  position: relative;
+  top: -80px;
+`;
+
+const BigOverview = styled.p`
+  padding: 20px;
+  position: relative;
+  top: -80px;
+  color: ${(props) => props.theme.white.lighter};
 `;
