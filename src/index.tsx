@@ -149,9 +149,8 @@ const GlobalStyle = createGlobalStyle`
  
    body {
      font-family: 'Mukta', sans-serif;
-     background-color: white;
+     background-color: black;
      color: ${(props) => props.theme.white.lighter};
-     height: 200vh; // TODO: 삭제
      
    }
 
