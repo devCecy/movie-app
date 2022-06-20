@@ -1,9 +1,15 @@
 import { motion, useAnimation, useViewportScroll } from "framer-motion";
 import { useEffect, useState } from "react";
-import { Link, useMatch } from "react-router-dom";
+import { Link, useMatch, useNavigate } from "react-router-dom";
 import styled from "styled-components";
+import { useForm } from "react-hook-form";
+interface IForm {
+  keyword: string;
+}
 
 function Header() {
+  const navigate = useNavigate();
+  const { register, handleSubmit } = useForm<IForm>();
   const [isSearchOpend, setIsSearchOpend] = useState(false);
   const inputAnimation = useAnimation();
   const navAnimation = useAnimation();
@@ -34,6 +40,9 @@ function Header() {
     setIsSearchOpend((prev) => !prev);
   };
 
+  const onValid = (data: IForm) => {
+    navigate(`/search?keyword=${data.keyword}`);
+  };
   const svg = {
     start: {
       pathLength: 0,
@@ -92,7 +101,7 @@ function Header() {
         </Items>
       </Column>
       <Column>
-        <Search>
+        <Search onSubmit={handleSubmit(onValid)}>
           <motion.svg
             onClick={openSearch}
             animate={{ x: isSearchOpend ? -180 : 0 }}
@@ -108,6 +117,7 @@ function Header() {
             />
           </motion.svg>
           <Input
+            {...register("keyword", { required: true, minLength: 2 })}
             placeholder="Search for movie or tv"
             animate={inputAnimation}
             initial={{ scaleX: 0 }}
@@ -132,6 +142,7 @@ const Nav = styled(motion.nav)`
   font-size: 14px;
   padding: 20px 60px;
   color: white;
+  z-index: 999;
 `;
 
 const Column = styled.div`
@@ -180,7 +191,7 @@ const Circle = styled(motion.span)`
   background-color: ${(props) => props.theme.red};
 `;
 
-const Search = styled.span`
+const Search = styled.form`
   color: white;
   display: flex;
   align-items: center;
