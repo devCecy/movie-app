@@ -65,7 +65,6 @@ function Home() {
     ]);
   }, [nowPlayingData, topRatedMovieData, upCommingMovieData]);
 
-  const [leaving, setLeaving] = useState(false);
   const [isPrev, setIsPrev] = useState(false);
 
   const increaseIndex = (e: any) => {
@@ -80,8 +79,6 @@ function Home() {
     if (!targetSlider) return;
 
     if (targetSlider?.data) {
-      // if (leaving) return;
-      // toggleLeaving();
       const totalMovies = targetSlider?.data?.results?.length;
       const maxIndex = Math.floor(totalMovies / offset);
       const newIndexList = {
@@ -111,8 +108,6 @@ function Home() {
     if (!targetSlider) return;
 
     if (targetSlider?.data) {
-      // if (leaving) return;
-      // toggleLeaving();
       const totalMovies = targetSlider?.data?.results?.length;
       const maxIndex = Math.floor(totalMovies / offset);
       const newIndexList = {
@@ -128,10 +123,6 @@ function Home() {
       ]);
     }
     setIsPrev(true);
-  };
-
-  const toggleLeaving = () => {
-    setLeaving((prev) => !prev);
   };
 
   const [clickedData, setClickedData] = useState<IGetMoviesResult>();
@@ -214,6 +205,7 @@ function Home() {
                   onClick={decreaseIndex}
                 />
               )}
+              {/* TODO: next, prev 버튼 넷플처럼 처리하기 */}
               <Next
                 variants={arrowVar}
                 id={String(slider.id)}
@@ -222,7 +214,8 @@ function Home() {
               <Slider>
                 <AnimatePresence
                   initial={false}
-                  onExitComplete={toggleLeaving}
+                  //TODO:onExitComplete 정확히알기
+                  // onExitComplete={toggleLeaving}
                   custom={isPrev}
                 >
                   <Row
@@ -243,7 +236,7 @@ function Home() {
                       )
                       .map((movie) => (
                         <Box
-                          layoutId={String(movie.id)}
+                          // layoutId={String(movie.id)}
                           // id={`${slider.id}.${movie.id}`}
                           key={movie.id}
                           variants={boxVar}
@@ -269,7 +262,7 @@ function Home() {
                   >
                     <MovieModal
                       id={movieMatch.params.movieId}
-                      layoutId={movieMatch.params.movieId}
+                      // layoutId={movieMatch.params.movieId}
                       // layoutId={`${slider.id}.${movieMatch.params.movieId}`}
                     >
                       {clickedMovie && (
