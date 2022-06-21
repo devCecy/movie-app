@@ -8,6 +8,9 @@ export interface IMovies {
   title: string;
   overview: string;
   media_type?: string;
+  release_date: string;
+  runtime: number;
+  popularity: number;
 }
 export interface IGetMoviesResult {
   dates?: {
@@ -34,6 +37,12 @@ export function getTopRatedMovie() {
 
 export function getUpcommingMovie() {
   return fetch(`${BASE_PATH}/movie/upcoming?api_key=${API_KEY}`).then((res) =>
+    res.json()
+  );
+}
+
+export function getMovieDetail(movieId: number) {
+  return fetch(`${BASE_PATH}/movie/${movieId}?api_key=${API_KEY}`).then((res) =>
     res.json()
   );
 }
