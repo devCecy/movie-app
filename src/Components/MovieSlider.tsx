@@ -4,7 +4,6 @@ import { useQuery } from "react-query";
 import { useLocation, useMatch, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import {
-  getLatestMovie,
   getMovies,
   getTopRatedMovie,
   getUpcommingMovie,
@@ -20,16 +19,17 @@ function Home() {
 
   // TODO: 데이터 한번에 불러 오는 방법이 있는지 ?
   const { data: nowPlayingData, isLoading: nowPlayingLoading } =
-    useQuery<IGetMoviesResult>(["nowPlaying"], getMovies);
+    useQuery<IGetMoviesResult>("nowPlaying", getMovies);
 
-  const { data: topRatedMovieData, isLoading: topRatedMovieLoading } =
-    useQuery<IGetMoviesResult>(["topRatedMovie"], getTopRatedMovie);
+  const { data: topRatedMovieData } = useQuery<IGetMoviesResult>(
+    "topRatedMovie",
+    getTopRatedMovie
+  );
 
-  const { data: upCommingMovieData, isLoading: upCommingMovieLoading } =
-    useQuery<IGetMoviesResult>(["upCommingMovie"], getUpcommingMovie);
-
-  const { data: latestMovieData, isLoading: latestMovieLoading } =
-    useQuery<IGetMoviesResult>(["latestMovie"], getLatestMovie);
+  const { data: upCommingMovieData } = useQuery<IGetMoviesResult>(
+    "upCommingMovie",
+    getUpcommingMovie
+  );
 
   const [sliderList, setSliderList] = useState([
     {
@@ -45,7 +45,6 @@ function Home() {
       title: "지금 사람들이 가장 많이 보고있는 콘텐츠",
     },
     { id: 2, index: 0, data: upCommingMovieData, title: "곧 개봉해요!" },
-    { id: 3, index: 0, data: latestMovieData, title: "최신 콘텐츠" },
   ]);
 
   useEffect(() => {
@@ -63,9 +62,8 @@ function Home() {
         title: "지금 사람들이 가장 많이 보고있는 콘텐츠",
       },
       { id: 2, index: 0, data: upCommingMovieData, title: "곧 개봉해요!" },
-      { id: 3, index: 0, data: latestMovieData, title: "최신 콘텐츠" },
     ]);
-  }, [nowPlayingData, topRatedMovieData, upCommingMovieData, latestMovieData]);
+  }, [nowPlayingData, topRatedMovieData, upCommingMovieData]);
 
   const [leaving, setLeaving] = useState(false);
   const [isPrev, setIsPrev] = useState(false);
@@ -143,9 +141,7 @@ function Home() {
         ? nowPlayingData
         : category === 1
         ? topRatedMovieData
-        : category === 2
-        ? upCommingMovieData
-        : latestMovieData
+        : upCommingMovieData
     );
     navigate(`movie/${movieId}`);
   };
@@ -197,7 +193,7 @@ function Home() {
   return (
     <>
       {nowPlayingLoading ? (
-        <Loader />
+        <Loader>Loading...</Loader>
       ) : (
         <>
           <Banner
