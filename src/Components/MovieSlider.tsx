@@ -7,7 +7,9 @@ import {
   getMovies,
   getTopRatedMovie,
   getUpcommingMovie,
+  getMovieDetail,
   IGetMoviesResult,
+  IMovies,
 } from "../api";
 import { makeImagePath } from "../utiles";
 
@@ -16,6 +18,8 @@ const offset = 6;
 function Home() {
   const navigate = useNavigate();
   const movieMatch = useMatch("/movie/:movieId");
+  const [movieId, setMovieId] = useState<number>();
+  const [clickedData, setClickedData] = useState<IGetMoviesResult>();
 
   // TODO: 데이터 한번에 불러 오는 방법이 있는지 ?
   const { data: nowPlayingData, isLoading: nowPlayingLoading } =
@@ -29,6 +33,11 @@ function Home() {
   const { data: upCommingMovieData } = useQuery<IGetMoviesResult>(
     "upCommingMovie",
     getUpcommingMovie
+  );
+
+  const { data: detailMovieData } = useQuery<IMovies>(
+    ["movieDetail", movieId],
+    () => getMovieDetail(movieId || 0)
   );
 
   const [sliderList, setSliderList] = useState([
@@ -125,8 +134,8 @@ function Home() {
     setIsPrev(true);
   };
 
-  const [clickedData, setClickedData] = useState<IGetMoviesResult>();
   const onBoxClicked = (movieId: number, category: number) => {
+    setMovieId(movieId);
     setClickedData(
       category === 0
         ? nowPlayingData
@@ -136,12 +145,6 @@ function Home() {
     );
     navigate(`movie/${movieId}`);
   };
-
-  const clickedMovie =
-    movieMatch?.params?.movieId &&
-    clickedData?.results?.find(
-      (movie) => String(movie.id) === movieMatch.params.movieId
-    );
 
   const onOverlayClick = () => {
     navigate("/");
@@ -265,18 +268,29 @@ function Home() {
                       // layoutId={movieMatch.params.movieId}
                       // layoutId={`${slider.id}.${movieMatch.params.movieId}`}
                     >
-                      {clickedMovie && (
+                      {detailMovieData && (
                         <>
-                          <BigCover
+                          <ModalCover
                             style={{
                               backgroundImage: `linear-gradient(to top, black, transparent), url(${makeImagePath(
-                                clickedMovie?.backdrop_path || "",
+                                detailMovieData?.backdrop_path || "",
                                 "w500"
                               )})`,
                             }}
                           />
-                          <BigTitle>{clickedMovie?.title}</BigTitle>
-                          <BigOverview>{clickedMovie?.overview}</BigOverview>
+                          <ModalTitle>
+                            {detailMovieData?.title.length > 21
+                              ? `${detailMovieData?.title.slice(0, 21)}...`
+                              : detailMovieData?.title}
+                          </ModalTitle>
+                          <ModalInfoBox>
+                            <span>개봉일 : {detailMovieData.release_date}</span>
+                            <span>런타임 : {detailMovieData.runtime}분</span>
+                            <span>평점 : {detailMovieData.popularity}점</span>
+                          </ModalInfoBox>
+                          <ModalOverview>
+                            {detailMovieData?.overview}
+                          </ModalOverview>
                         </>
                       )}
                     </MovieModal>
@@ -422,14 +436,14 @@ const MovieModal = styled(motion.div)`
   background-color: ${(props) => props.theme.black.lighter};
 `;
 
-const BigCover = styled.div`
+const ModalCover = styled.div`
   width: 100%;
   background-size: cover;
   background-position: center center;
   height: 400px;
 `;
 
-const BigTitle = styled.h3`
+const ModalTitle = styled.h3`
   color: ${(props) => props.theme.white.lighter};
   padding: 20px;
   font-size: 46px;
@@ -437,7 +451,18 @@ const BigTitle = styled.h3`
   top: -80px;
 `;
 
-const BigOverview = styled.p`
+const ModalInfoBox = styled.div`
+  display: flex;
+  justify-content: flex-start;
+  padding: 20px;
+  position: relative;
+  top: -80px;
+  span {
+    margin-right: 10px;
+  }
+`;
+
+const ModalOverview = styled.p`
   padding: 20px;
   position: relative;
   top: -80px;
