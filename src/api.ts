@@ -32,12 +32,6 @@ export function getTopRatedMovie() {
   ).then((res) => res.json());
 }
 
-export function getLatestMovie() {
-  return fetch(`${BASE_PATH}/movie/latest?api_key=${API_KEY}`).then((res) =>
-    res.json()
-  );
-}
-
 export function getUpcommingMovie() {
   return fetch(`${BASE_PATH}/movie/upcoming?api_key=${API_KEY}`).then((res) =>
     res.json()
