@@ -1,5 +1,6 @@
 import ReactDOM from "react-dom/client";
 import { QueryClient, QueryClientProvider } from "react-query";
+import { ReactQueryDevtools } from "react-query/devtools";
 import { RecoilRoot } from "recoil";
 import { createGlobalStyle, ThemeProvider } from "styled-components";
 import App from "./App";
@@ -174,6 +175,7 @@ const client = new QueryClient();
 root.render(
   <RecoilRoot>
     <QueryClientProvider client={client}>
+      <ReactQueryDevtools initialIsOpen={false} />
       <ThemeProvider theme={theme}>
         <GlobalStyle />
         <App />
