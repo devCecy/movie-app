@@ -203,17 +203,13 @@ function Home() {
               <SubTitle>{slider.title}</SubTitle>
               {slider.index !== 0 && (
                 <Prev
+                  style={{ left: "20px" }}
                   variants={arrowVar}
                   id={String(slider.id)}
                   onClick={decreaseIndex}
                 />
               )}
-              {/* TODO: next, prev 버튼 넷플처럼 처리하기 */}
-              <Next
-                variants={arrowVar}
-                id={String(slider.id)}
-                onClick={increaseIndex}
-              />
+
               <Slider>
                 <AnimatePresence
                   initial={false}
@@ -256,6 +252,13 @@ function Home() {
                   </Row>
                 </AnimatePresence>
               </Slider>
+              {/* TODO: next, prev 버튼 넷플처럼 처리하기 */}
+              <Next
+                style={{ right: "20px" }}
+                variants={arrowVar}
+                id={String(slider.id)}
+                onClick={increaseIndex}
+              />
               <AnimatePresence>
                 {movieMatch && (
                   <Overlay
@@ -350,29 +353,25 @@ const Slider = styled.div`
   position: relative;
 `;
 
-// TODO: 재사용할것
 const Prev = styled(motion.span)`
   position: absolute;
   top: 100px;
-  left: 20px;
   font-size: 30px;
   &::before {
     content: "<";
   }
   z-index: 99;
   cursor: pointer;
+  opacity: 1;
 `;
-const Next = styled(motion.span)`
-  position: absolute;
-  top: 100px;
-  right: 20px;
-  font-size: 30px;
+
+const Next = styled(Prev)`
+  &::before {
+    content: none;
+  }
   &::after {
     content: ">";
   }
-  z-index: 99;
-  cursor: pointer;
-  opacity: 0;
 `;
 
 const Row = styled(motion.div)`

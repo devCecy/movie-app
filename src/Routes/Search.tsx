@@ -116,10 +116,12 @@ function Search() {
       <SliderWrapper whileHover="hover">
         <SubTitle>"영화"에서 검색 한 결과</SubTitle>
         {movieIndex !== 0 && (
-          <Prev id="movie" variants={arrowVar} onClick={decreaseIndex} />
-        )}
-        {movieLength > 6 && (
-          <Next id="movie" variants={arrowVar} onClick={increaseIndex} />
+          <Prev
+            style={{ left: "20px" }}
+            id="movie"
+            variants={arrowVar}
+            onClick={decreaseIndex}
+          />
         )}
         <Slider>
           <AnimatePresence initial={false} custom={isPrev}>
@@ -147,14 +149,32 @@ function Search() {
             </Row>
           </AnimatePresence>
         </Slider>
+        {movieLength > 6 && (
+          <Next
+            style={{ right: "20px" }}
+            id="movie"
+            variants={arrowVar}
+            onClick={increaseIndex}
+          />
+        )}
       </SliderWrapper>
       <SliderWrapper whileHover="hover" style={{ marginTop: "150px" }}>
         <SubTitle>"TV"에서 검색 한 결과</SubTitle>
         {tvIndex !== 0 && (
-          <Prev id="tv" variants={arrowVar} onClick={decreaseIndex} />
+          <Prev
+            style={{ left: "20px" }}
+            id="tv"
+            variants={arrowVar}
+            onClick={decreaseIndex}
+          />
         )}
         {tvLength > 6 && (
-          <Next id="tv" variants={arrowVar} onClick={increaseIndex} />
+          <Next
+            style={{ right: "20px" }}
+            id="tv"
+            variants={arrowVar}
+            onClick={increaseIndex}
+          />
         )}
         <Slider>
           <AnimatePresence initial={false} custom={isPrev}>
@@ -210,26 +230,22 @@ const Slider = styled.div`
 const Prev = styled(motion.span)`
   position: absolute;
   top: 100px;
-  left: 20px;
   font-size: 30px;
   &::before {
     content: "<";
   }
   z-index: 99;
   cursor: pointer;
-  opacity: 0;
+  /* opacity: 0; */
 `;
-const Next = styled(motion.span)`
-  position: absolute;
-  top: 100px;
-  right: 20px;
-  font-size: 30px;
+
+const Next = styled(Prev)`
+  &::before {
+    content: none;
+  }
   &::after {
     content: ">";
   }
-  z-index: 99;
-  cursor: pointer;
-  opacity: 0;
 `;
 
 const Row = styled(motion.div)`
